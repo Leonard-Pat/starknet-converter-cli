@@ -1,5 +1,5 @@
 [package]
-name = "starknet-converter-cli"
+name = "snconvert"
 version = "0.1.0"
 edition = "2021"
 
