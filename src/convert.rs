@@ -1,5 +1,5 @@
 use starknet_core::types::Felt;
-use starknet_core::utils::cairo_short_string_to_felt;
+use starknet_core::utils::{cairo_short_string_to_felt, parse_cairo_short_string};
 
 #[derive(Debug, Clone, Copy)]
 pub enum InputType {
@@ -62,16 +62,13 @@ fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
 }
 
 fn convert_from_felt(input: &str) -> Result<ConversionResult, String> {
-    let felt = Felt::from_dec_str(input).map_err(|e| e.to_string())?;
+    let felt = Felt::from_dec_str(&input).map_err(|e| e.to_string())?;
     let hex = format!("0x{}", hex::encode(felt.to_bytes_be()));
-    let string = String::from_utf8(felt.to_bytes_be().to_vec())
-        .ok()
-        .filter(|s| s.len() <= 31);
-
+    let string = parse_cairo_short_string(&felt).unwrap().to_string();
     Ok(ConversionResult {
         hex: Some(hex),
         felt: Some(input.to_string()),
-        string,
+        string: Some(string),
     })
 }
 
