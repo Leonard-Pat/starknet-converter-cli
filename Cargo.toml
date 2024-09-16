@@ -1,8 +1,8 @@
 [package]
 name = "snconvert"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
-authors = ["Tiffany Gerstmeyr, <tiffgerst@gmail.com>, Leonard Paturel <leonardpaturel@email.com>"]
+authors = ["Tiffany Gerstmeyr, <tiffgerst@gmail.com>, Leonard Paturel <leonardpaturel@gmail.com>"]
 license = "MIT"
 description = "A CLI tool to convert common starknet types"
 readme = "README.md"

@@ -42,24 +42,24 @@ If no options are specified, the tool will display all available representations
 1. Convert a hexadecimal value:
 
    ```
-   snconvert 0x123 -f -s
+   snconvert 0x6869 -f -s
    ```
 
 2. Convert a felt value:
 
    ```
-   snconvert 1234567890 -x -s
+   snconvert 310939249775 -x -s
    ```
 
 3. Convert a string:
 
    ```
-   snconvert "Hello, Starknet!" -x -f
+   snconvert 'Hello, Starknet!' -x -f
    ```
 
 4. Display all representations:
    ```
-   snconvert 0xabcdef
+   snconvert 0x48656c6c6f20576f726c6421
    ```
 
 ## Error Handling
