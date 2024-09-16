@@ -21,7 +21,6 @@ pub fn identify_input_type(input: &str) -> Result<InputType, String> {
     } else if input.chars().all(|c| c.is_ascii_digit()) {
         Ok(InputType::Felt)
     } else if input.chars().any(|c| !c.is_ascii_hexdigit()) {
-        // If it contains any non-hex characters, consider it a string
         Ok(InputType::String)
     } else {
         Err("Invalid input format".to_string())
@@ -37,7 +36,6 @@ pub fn convert(input: &str, input_type: InputType) -> Result<ConversionResult, S
 }
 
 fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
-    // Remove '0x' prefix if present
     let hex_str = input.strip_prefix("0x").unwrap_or(input);
 
     // Pad with a leading zero if the length is odd
