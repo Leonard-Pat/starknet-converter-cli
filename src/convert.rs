@@ -37,10 +37,22 @@ pub fn convert(input: &str, input_type: InputType) -> Result<ConversionResult, S
 }
 
 fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
-    let felt = Felt::from_hex(input).map_err(|e| e.to_string())?;
-    let string = String::from_utf8(hex::decode(&input[2..]).unwrap())
-        .ok()
-        .filter(|s| s.len() <= 31);
+    // Remove '0x' prefix if present
+    let hex_str = input.strip_prefix("0x").unwrap_or(input);
+
+    // Pad with a leading zero if the length is odd
+    let padded_hex = if hex_str.len() % 2 != 0 {
+        format!("0{}", hex_str)
+    } else {
+        hex_str.to_string()
+    };
+
+    let felt =
+        Felt::from_hex(&format!("0x{}", padded_hex)).map_err(|e| format!("Invalid hex: {}", e))?;
+
+    let bytes = hex::decode(&padded_hex).map_err(|e| format!("Invalid hex: {}", e))?;
+
+    let string = String::from_utf8(bytes).ok().filter(|s| s.len() <= 31);
 
     Ok(ConversionResult {
         hex: Some(input.to_string()),
