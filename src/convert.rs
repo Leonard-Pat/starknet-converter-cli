@@ -1,132 +1,79 @@
-use hex::FromHex;
-use starknet::core::types::FieldElement;
-use starknet::core::utils::cairo_short_string_to_felt;
+use starknet_core::types::Felt;
+use starknet_core::utils::cairo_short_string_to_felt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum InputType {
     Hex,
     Felt,
     String,
 }
 
-pub struct ReturnType {
+#[derive(Debug)]
+pub struct ConversionResult {
     pub hex: Option<String>,
     pub felt: Option<String>,
     pub string: Option<String>,
 }
 
-pub trait ParseTypeTrait {
-    fn find_and_validate_type(&self) -> Result<InputType, String>;
-    fn convert_type(
-        &self,
-        input_type: InputType,
-        felt: bool,
-        hex: bool,
-        string: bool,
-    ) -> ReturnType;
+pub fn identify_input_type(input: &str) -> Result<InputType, String> {
+    if input.starts_with("0x") && input[2..].chars().all(|c| c.is_ascii_hexdigit()) {
+        Ok(InputType::Hex)
+    } else if input.chars().all(|c| c.is_ascii_digit()) {
+        Ok(InputType::Felt)
+    } else if input.chars().any(|c| !c.is_ascii_hexdigit()) {
+        // If it contains any non-hex characters, consider it a string
+        Ok(InputType::String)
+    } else {
+        Err("Invalid input format".to_string())
+    }
 }
 
-impl ParseTypeTrait for String {
-    fn find_and_validate_type(&self) -> Result<InputType, String> {
-        if self.starts_with("0x") {
-            if self[2..].chars().all(|c| c.is_ascii_hexdigit()) {
-                return Ok(InputType::Hex);
-            } else {
-                return Err(format!("Invalid hexadecimal string: {}", self));
-            }
-        } else if self.chars().any(|c| c.is_numeric()) {
-            if FieldElement::from_dec_str(self).is_err() {
-                return Err(format!("Invalid felt (felt too long): {}", self));
-            } else {
-                return Ok(InputType::Felt);
-            }
-        } else {
-            if self.chars().count() <= 31 {
-                return Ok(InputType::String);
-            } else {
-                return Err(format!(
-                    "Invalid short string {}, must be less than 32 characters",
-                    self
-                ));
-            }
-        }
+pub fn convert(input: &str, input_type: InputType) -> Result<ConversionResult, String> {
+    match input_type {
+        InputType::Hex => convert_from_hex(input),
+        InputType::Felt => convert_from_felt(input),
+        InputType::String => convert_from_string(input),
+    }
+}
+
+fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
+    let felt = Felt::from_hex(input).map_err(|e| e.to_string())?;
+    let string = String::from_utf8(hex::decode(&input[2..]).unwrap())
+        .ok()
+        .filter(|s| s.len() <= 31);
+
+    Ok(ConversionResult {
+        hex: Some(input.to_string()),
+        felt: Some(felt.to_string()),
+        string,
+    })
+}
+
+fn convert_from_felt(input: &str) -> Result<ConversionResult, String> {
+    let felt = Felt::from_dec_str(input).map_err(|e| e.to_string())?;
+    let hex = format!("0x{}", hex::encode(felt.to_bytes_be()));
+    let string = String::from_utf8(felt.to_bytes_be().to_vec())
+        .ok()
+        .filter(|s| s.len() <= 31);
+
+    Ok(ConversionResult {
+        hex: Some(hex),
+        felt: Some(input.to_string()),
+        string,
+    })
+}
+
+fn convert_from_string(input: &str) -> Result<ConversionResult, String> {
+    if input.len() > 31 {
+        return Err("String too long (max 31 characters)".to_string());
     }
 
-    fn convert_type(
-        &self,
-        input_type: InputType,
-        mut felt: bool,
-        mut hex: bool,
-        mut string: bool,
-    ) -> ReturnType {
-        let mut response: ReturnType = ReturnType {
-            hex: None,
-            felt: None,
-            string: None,
-        };
-        match input_type {
-            InputType::Hex => {
-                if !hex && !felt && !string {
-                    felt = true;
-                    hex = true;
-                    string = true;
-                }
-                if hex {
-                    response.hex = Some(self.to_string());
-                }
-                if felt {
-                    response.felt = Some(FieldElement::from_hex_be(&self).unwrap().to_string());
-                }
-                if string {
-                    let s = String::from(self);
-                    let buffer = <[u8; 12]>::from_hex(&s[2..]).ok();
-                    match buffer {
-                        Some(buffer) => {
-                            let string = core::str::from_utf8(&buffer).unwrap_or("");
-                            response.string = Some(string.to_string());
-                        }
-                        None => {
-                            response.string = None;
-                        }
-                    }
-                }
+    let felt = cairo_short_string_to_felt(input).unwrap().to_string();
+    let hex = format!("0x{}", hex::encode(input.as_bytes()));
 
-                return response;
-            }
-            InputType::Felt => {
-                if !hex && !felt && !string {
-                    felt = true;
-                    hex = true;
-                    string = true;
-                }
-                if hex {
-                    response.hex = Some("hello".to_string())
-                }
-                if felt {
-                    response.felt = Some(FieldElement::from_dec_str(self).unwrap().to_string());
-                }
-                if string {
-                    response.string = Some("hello".to_string())
-                }
-                return response;
-            }
-            InputType::String => {
-                if !hex && !felt && !string {
-                    felt = true;
-                    hex = true;
-                    string = true;
-                }
-                if hex {
-                    response.hex = Some(hex::encode(self))
-                }
-                if felt {
-                    response.felt = Some(cairo_short_string_to_felt(self).unwrap().to_string());
-                }
-                if string {
-                    response.string = Some(self.to_string())
-                }
-                return response;
-            }
-        }
-    }
+    Ok(ConversionResult {
+        hex: Some(hex),
+        felt: Some(felt),
+        string: Some(input.to_string()),
+    })
 }
