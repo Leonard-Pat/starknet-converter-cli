@@ -17,7 +17,7 @@ To install please use the cargo install command:
 cargo install snconvert
 ```
 
-This will install the CLI tool directly from [creates.io](https://crates.io/crates/snconvert)
+This will install the CLI tool directly from [crates.io](https://crates.io/crates/snconvert)
 
 ## Usage
 
