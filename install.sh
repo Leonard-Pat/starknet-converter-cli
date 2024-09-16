@@ -8,7 +8,7 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Detect the operating system
+# Detect the operating system and architecture
 OS="$(uname)"
 ARCH="$(uname -m)"
 
@@ -16,7 +16,7 @@ echo -e "${BLUE}Installing Starknet Converter CLI...${NC}"
 
 # Define the GitHub repository and release information
 REPO="Leonard-Pat/starknet-converter-cli"
-VERSION="latest"  # You can change this to a specific version if needed
+VERSION="v0.1.0"  # Update this to your actual version
 
 # Determine the correct binary for the OS and architecture
 case "$OS" in
@@ -30,7 +30,6 @@ case "$OS" in
     "Linux")
         case "$ARCH" in
             "x86_64") BINARY="snconvert-linux-x86_64" ;;
-            "aarch64") BINARY="snconvert-linux-aarch64" ;;
             *) echo -e "${RED}Unsupported architecture: $ARCH${NC}" && exit 1 ;;
         esac
         ;;
@@ -43,7 +42,7 @@ esac
 TMP_DIR=$(mktemp -d)
 cd "$TMP_DIR"
 
-# Download the latest release
+# Download the binary
 echo -e "${BLUE}Downloading Starknet Converter CLI...${NC}"
 curl -sLO "https://github.com/$REPO/releases/download/$VERSION/$BINARY"
 
