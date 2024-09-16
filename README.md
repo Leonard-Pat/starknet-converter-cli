@@ -13,7 +13,7 @@ A command-line interface tool for converting between different data types common
 
 To install please use the cargo install command:
 
-```console
+```
 cargo install snconvert
 ```
 
