@@ -60,7 +60,7 @@ fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
 }
 
 fn convert_from_felt(input: &str) -> Result<ConversionResult, String> {
-    let felt = Felt::from_dec_str(&input).map_err(|e| e.to_string())?;
+    let felt = Felt::from_dec_str(input).map_err(|e| e.to_string())?;
     let hex = format!("0x{}", hex::encode(felt.to_bytes_be()));
     let string = parse_cairo_short_string(&felt).unwrap().to_string();
     Ok(ConversionResult {
