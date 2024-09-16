@@ -9,6 +9,16 @@ A command-line interface tool for converting between different data types common
 - Robust error handling and informative error messages
 - Support for various input formats
 
+## Installation
+
+To install please use the cargo install command:
+
+```bash
+cargo install snconvert
+```
+
+This will install the CLI tool directly from [creates.io](https://crates.io/crates/snconvert)
+
 ## Usage
 
 The basic syntax for using the Starknet Converter CLI is:
