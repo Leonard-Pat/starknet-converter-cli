@@ -111,17 +111,14 @@ fn test_convert_from_string() {
 
 #[test]
 fn test_convert_integration() {
-    // Test hex input
     let result = convert("0x123abc", InputType::Hex).unwrap();
     assert_eq!(result.hex, Some("0x123abc".to_string()));
     assert_eq!(result.felt, Some("1194684".to_string()));
 
-    // Test felt input
     let result = convert("1194684", InputType::Felt).unwrap();
     assert_eq!(result.hex, Some("0x123abc".to_string()));
     assert_eq!(result.felt, Some("1194684".to_string()));
 
-    // Test string input
     let result = convert("Hello", InputType::ShortString).unwrap();
     assert_eq!(result.hex, Some("0x48656c6c6f".to_string()));
     assert_eq!(result.felt, Some("310939249775".to_string()));
