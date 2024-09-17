@@ -1,50 +1,61 @@
 name: Lint and Format
 on:
-  push:
   pull_request:
-
+    branches: [main]
 env:
   CARGO_TERM_COLOR: always
 jobs:
-  fmt:
+  rustfmt:
+    name: Rustfmt [Formatter]
     runs-on: ubuntu-latest
-    name: nightly / fmt
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Install stable
-        # We run in nightly to make use of some features only available there.
-        # Check out `rustfmt.toml` to see which ones.
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - name: cargo fmt --all --check
-        run: cargo fmt --all --check
+
+      - name: Build | Format
+        run: cargo fmt --all -- --check
+
+  # Run the `clippy` linting tool
   clippy:
-    runs-on: ubuntu-latest
-    name: ${{ matrix.toolchain }} / clippy
-    permissions:
-      contents: read
-      checks: write
+    name: Clippy [Linter]
     strategy:
-      fail-fast: false
       matrix:
-        # Get early warning of new lints which are regularly introduced in beta
-        # channels.
-        toolchain: [stable, beta]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          submodules: true
-      - name: Install ${{ matrix.toolchain }}
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.toolchain }}
           components: clippy
-      - name: cargo clippy
-        uses: giraffate/clippy-action@v1
-        with:
-          reporter: "github-pr-check"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup | Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build | Lint
+        uses: giraffate/clippy-action@94e9bd8deab2618756ec5380f12eb35bcb0a88ca
+
+  # Ensure that the project could be successfully compiled
+  cargo_check:
+    name: Compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup | Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build | Check
+        run: cargo check --workspace --locked
 
