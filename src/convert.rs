@@ -5,14 +5,14 @@ use starknet_core::utils::{cairo_short_string_to_felt, parse_cairo_short_string}
 pub enum InputType {
     Hex,
     Felt,
-    String,
+    ShortString,
 }
 
 #[derive(Debug)]
 pub struct ConversionResult {
     pub hex: Option<String>,
     pub felt: Option<String>,
-    pub string: Option<String>,
+    pub short_string: Option<String>,
 }
 
 pub fn identify_input_type(input: &str) -> Result<InputType, String> {
@@ -21,7 +21,7 @@ pub fn identify_input_type(input: &str) -> Result<InputType, String> {
     } else if input.chars().all(|c| c.is_ascii_digit()) {
         Ok(InputType::Felt)
     } else if input.chars().any(|c| !c.is_ascii_hexdigit()) {
-        Ok(InputType::String)
+        Ok(InputType::ShortString)
     } else {
         Err("Invalid input format".to_string())
     }
@@ -31,7 +31,7 @@ pub fn convert(input: &str, input_type: InputType) -> Result<ConversionResult, S
     match input_type {
         InputType::Hex => convert_from_hex(input),
         InputType::Felt => convert_from_felt(input),
-        InputType::String => convert_from_string(input),
+        InputType::ShortString => convert_from_string(input),
     }
 }
 
@@ -55,7 +55,7 @@ fn convert_from_hex(input: &str) -> Result<ConversionResult, String> {
     Ok(ConversionResult {
         hex: Some(input.to_string()),
         felt: Some(felt.to_string()),
-        string,
+        short_string: string,
     })
 }
 
@@ -66,7 +66,7 @@ fn convert_from_felt(input: &str) -> Result<ConversionResult, String> {
     Ok(ConversionResult {
         hex: Some(hex),
         felt: Some(input.to_string()),
-        string: Some(string),
+        short_string: Some(string),
     })
 }
 
@@ -81,6 +81,6 @@ fn convert_from_string(input: &str) -> Result<ConversionResult, String> {
     Ok(ConversionResult {
         hex: Some(hex),
         felt: Some(felt),
-        string: Some(input.to_string()),
+        short_string: Some(input.to_string()),
     })
 }

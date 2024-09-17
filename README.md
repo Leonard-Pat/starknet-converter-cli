@@ -4,7 +4,7 @@ A command-line interface tool for converting between different data types common
 
 ## Features
 
-- Convert between hexadecimal, felt (field element), and string representations
+- Convert between hexadecimal, felt (field element), and short string representations
 - Easy-to-use CLI with intuitive options
 - Robust error handling and informative error messages
 - Support for various input formats
@@ -33,7 +33,7 @@ Where `<INPUT>` is the value you want to convert, and `[OPTIONS]` are the conver
 
 - `-x, --hex`: Display the hexadecimal representation
 - `-f, --felt`: Display the felt (field element) representation
-- `-s, --string`: Display the string representation
+- `-s, --string`: Display the short string representation
 
 If no options are specified, the tool will display all available representations.
 
@@ -51,7 +51,7 @@ If no options are specified, the tool will display all available representations
    snconvert 310939249775 -x -s
    ```
 
-3. Convert a string:
+3. Convert a short string:
 
    ```
    snconvert 'Hello, Starknet!' -x -f
@@ -68,7 +68,7 @@ The Starknet Converter CLI includes robust error handling to help you identify i
 
 - Invalid input format
 - String too long (max 31 characters for Starknet short strings)
-- Non-ASCII characters in string input
+- Non-ASCII characters in short string input
 - Invalid hexadecimal format
 
 If an error occurs, the tool will display a helpful error message explaining the issue.

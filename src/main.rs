@@ -17,7 +17,7 @@ struct Cli {
     #[clap(short, long, value_parser, default_value_t = false)]
     felt: bool,
 
-    /// Display the string representation
+    /// Display the short string representation
     #[clap(short, long, value_parser, default_value_t = false)]
     string: bool,
 }
@@ -55,7 +55,10 @@ fn print_result(result: &ConversionResult, hex: bool, felt: bool, string: bool) 
             println!("Felt: {}", result.felt.as_deref().unwrap_or("N/A"));
         }
         if string {
-            println!("String: {}", result.string.as_deref().unwrap_or("N/A"));
+            println!(
+                "Short String: {}",
+                result.short_string.as_deref().unwrap_or("N/A")
+            );
         }
     }
 }
@@ -63,5 +66,8 @@ fn print_result(result: &ConversionResult, hex: bool, felt: bool, string: bool) 
 fn print_all(result: &ConversionResult) {
     println!("Hex: {}", result.hex.as_deref().unwrap_or("N/A"));
     println!("Felt: {}", result.felt.as_deref().unwrap_or("N/A"));
-    println!("String: {}", result.string.as_deref().unwrap_or("N/A"));
+    println!(
+        "Short String: {}",
+        result.short_string.as_deref().unwrap_or("N/A")
+    );
 }
